@@ -1,4 +1,6 @@
-package com.iamstmvasan.FirstProject;
+package com.iamstmvasan.FirstProject.model;
+
+import com.iamstmvasan.FirstProject.model.Address;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.iamstmvasan.FirstProject;
+package com.iamstmvasan.FirstProject.model;
 
 public class Address {
     private String doorNo;

@@ -1,5 +1,7 @@
 package com.iamstmvasan.FirstProject;
 
+import com.iamstmvasan.FirstProject.model.Address;
+import com.iamstmvasan.FirstProject.model.Student;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
