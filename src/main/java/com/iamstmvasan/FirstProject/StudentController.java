@@ -4,10 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class StudentController {
@@ -15,7 +12,7 @@ public class StudentController {
 
     //Initially i created two student's
     @RequestMapping(value = "student/create")
-    public ResponseEntity initialStudentData(){
+    public ResponseEntity createStudent(){
         ResponseEntity responseEntity;
             Student student = new Student();
             student.setId(987);
@@ -70,8 +67,9 @@ public class StudentController {
         }
     }
 
+    //Fetch all student data
     @RequestMapping(value = "/allStudents")
-    public ResponseEntity allStudents(){
+    public ResponseEntity fetchAllStudents(){
         ResponseEntity responseEntity;
         if(studentList.isEmpty()){
             Map<String , String> map = new HashMap<>();
@@ -85,6 +83,7 @@ public class StudentController {
         }
     }
 
+    //Fetch student by their name
     @RequestMapping(value = "/student/name/{name}")
     public ResponseEntity fetchStudentByName(@PathVariable("name") String name){
         ResponseEntity responseEntity;
@@ -110,6 +109,7 @@ public class StudentController {
 
     }
 
+    //Fetch student by their Id
     @RequestMapping(value = "/student/id/{id}")
     public ResponseEntity fetchStudentById(@PathVariable("id") int id){
         if(studentList.isEmpty()){
@@ -132,6 +132,7 @@ public class StudentController {
         }
     }
 
+    //Fetch student by language known
     @RequestMapping(value = "/student/language/{language}")
     public ResponseEntity fetchStudentByLanguage(@PathVariable("language") String language){
         List<Student> list = new ArrayList<>();
@@ -161,12 +162,13 @@ public class StudentController {
 
     }
 
+    // Add a new student data
     @RequestMapping(value = "/addStudent" , method = RequestMethod.POST)
     public ResponseEntity addStudent(@RequestBody Student addStudent){
         ResponseEntity responseEntity;
         Map<String , String> map = new HashMap<>();
         if( addStudentData(addStudent) ){
-            map.put("Message" , "Student Added Successfully !");
+            map.put("Message" , addStudent.getId()+" Student is Added Successfully !");
             responseEntity = new ResponseEntity(map , HttpStatus.OK);
             return responseEntity;
         }
@@ -178,6 +180,43 @@ public class StudentController {
 
     }
 
+    // Edit or Update student data
+    @RequestMapping(value = "/editStudent" , method = RequestMethod.PUT)
+    public ResponseEntity editStudent(@RequestBody Student editStudent){
+        ResponseEntity responseEntity;
+        Map<String , String> map = new HashMap<>();
+        boolean isStudentEdited = editStudentData(editStudent);
+        if(isStudentEdited){
+            map.put("Message" , editStudent.getId()+" Student data is Updated !" );
+            responseEntity = new ResponseEntity(map , HttpStatus.OK);
+            return responseEntity;
+        }
+        else{
+            map.put("Message" , editStudent.getId()+" Student data is not Available !" );
+            responseEntity = new ResponseEntity(map , HttpStatus.OK);
+            return responseEntity;
+        }
+    }
+
+    // Delete student data
+    @RequestMapping(value = "/deleteStudent", method = RequestMethod.DELETE)
+    public ResponseEntity deleteStudent(@RequestBody String id){
+        ResponseEntity responseEntity;
+        Map<String , String> map = new HashMap<>();
+        boolean isStudentDeleted = deleteStudentData(Integer.valueOf(id));
+        if(isStudentDeleted){
+            map.put("Message" , id+" Student data is Deleted !");
+            responseEntity = new ResponseEntity(map , HttpStatus.OK);
+            return responseEntity;
+        }
+        else{
+            map.put("Message" , id+" Student data is not available !");
+            responseEntity = new ResponseEntity(map , HttpStatus.OK);
+            return responseEntity;
+        }
+    }
+
+    //Checking before add a student, if that student data is already available or not
     private boolean addStudentData(Student addStudent){
         boolean studentAdded = true;
         for(Student student : studentList)
@@ -188,6 +227,43 @@ public class StudentController {
         if(studentAdded)
             studentList.add(addStudent);
         return studentAdded;
+
+    }
+
+    //Checking a student data is available or not for update student data
+    private boolean editStudentData(Student editStudent){
+        boolean studentEdited = false;
+        Iterator<Student> iterator = studentList.iterator();
+
+        while(iterator.hasNext()){
+            Student student = iterator.next();
+            if(student.getId() == editStudent.getId()){
+                iterator.remove();
+                studentEdited = true;
+                break;
+            }
+        }
+
+        if(studentEdited)
+            studentList.add(editStudent);
+        return studentEdited;
+    }
+
+    // Checking a student data is available or not for delete student data
+    private boolean deleteStudentData(int deleteStudentId){
+        boolean studentDeleted = false;
+        Iterator<Student> iterator = studentList.iterator();
+
+        while(iterator.hasNext()){
+            Student student = iterator.next();
+            if(student.getId() == deleteStudentId){
+                iterator.remove();
+                studentDeleted = true;
+                break;
+            }
+        }
+
+        return studentDeleted;
 
     }
 }
