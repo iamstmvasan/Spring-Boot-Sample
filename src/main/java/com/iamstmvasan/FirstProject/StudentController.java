@@ -2,6 +2,7 @@ package com.iamstmvasan.FirstProject;
 
 import com.iamstmvasan.FirstProject.model.Address;
 import com.iamstmvasan.FirstProject.model.Student;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,8 @@ import java.util.*;
 
 @RestController
 public class StudentController {
-    private List<Student> studentList = new ArrayList<>();
+    @Autowired
+    StudentServices studentServices;
 
     //Initially i created two student's
     @RequestMapping(value = "student/create")
@@ -53,8 +55,8 @@ public class StudentController {
             studentAddress2.setPin(613100);
             student2.setAddress(studentAddress);
 
-        boolean studentAdded = addStudentData(student);
-        boolean student2Added = addStudentData(student2);
+        boolean studentAdded = studentServices.addStudentData(student);
+        boolean student2Added = studentServices.addStudentData(student2);
         if(studentAdded || student2Added){
             Map<String, String> map = new HashMap<>();
             map.put("Message", "Student data is successfully Created !");
@@ -73,14 +75,14 @@ public class StudentController {
     @RequestMapping(value = "/allStudents")
     public ResponseEntity fetchAllStudents(){
         ResponseEntity responseEntity;
-        if(studentList.isEmpty()){
+        if(studentServices.studentList.isEmpty()){
             Map<String , String> map = new HashMap<>();
             map.put("Message","Student data is empty, Create Data(student/create)");
             responseEntity = new ResponseEntity(map , HttpStatus.NOT_FOUND);
             return responseEntity;
         }
         else{
-            responseEntity = new ResponseEntity(studentList , HttpStatus.OK);
+            responseEntity = new ResponseEntity(studentServices.studentList , HttpStatus.OK);
             return responseEntity;
         }
     }
@@ -89,14 +91,14 @@ public class StudentController {
     @RequestMapping(value = "/student/name/{name}")
     public ResponseEntity fetchStudentByName(@PathVariable("name") String name){
         ResponseEntity responseEntity;
-        if(studentList.isEmpty()){
+        if(studentServices.studentList.isEmpty()){
             Map<String , String> map = new HashMap<>();
             map.put("Message","Student data is empty, Create Data(student/create)");
             responseEntity = new ResponseEntity(map , HttpStatus.NOT_FOUND);
             return responseEntity;
         }
         else{
-            for(Student student: studentList) {
+            for(Student student: studentServices.studentList) {
                 if(student.getName().equalsIgnoreCase(name)) {
                     responseEntity = new ResponseEntity(student, HttpStatus.OK);
                     return responseEntity;
@@ -114,14 +116,14 @@ public class StudentController {
     //Fetch student by their Id
     @RequestMapping(value = "/student/id/{id}")
     public ResponseEntity fetchStudentById(@PathVariable("id") int id){
-        if(studentList.isEmpty()){
+        if(studentServices.studentList.isEmpty()){
             Map<String , String> map = new HashMap<>();
             map.put("Message","Student data is empty, Create Data(student/create)");
             ResponseEntity responseEntity = new ResponseEntity(map , HttpStatus.NOT_FOUND);
             return responseEntity;
         }
         else{
-            for(Student student: studentList) {
+            for(Student student: studentServices.studentList) {
                 if(student.getId() == id) {
                     ResponseEntity responseEntity = new ResponseEntity(student, HttpStatus.OK);
                     return responseEntity;
@@ -139,14 +141,14 @@ public class StudentController {
     public ResponseEntity fetchStudentByLanguage(@PathVariable("language") String language){
         List<Student> list = new ArrayList<>();
         boolean studentKnownLanguage = false;
-        if(studentList.isEmpty()){
+        if(studentServices.studentList.isEmpty()){
             Map<String , String> map = new HashMap<>();
             map.put("Message","Student data is empty, Create Data(student/create)");
             ResponseEntity responseEntity = new ResponseEntity(map , HttpStatus.NOT_FOUND);
             return responseEntity;
         }
         else{
-            for(Student student : studentList)
+            for(Student student : studentServices.studentList)
                 if(student.getLanguage().contains(language)){
                     studentKnownLanguage = true;
                     list.add(student);
@@ -169,7 +171,7 @@ public class StudentController {
     public ResponseEntity addStudent(@RequestBody Student addStudent){
         ResponseEntity responseEntity;
         Map<String , String> map = new HashMap<>();
-        if( addStudentData(addStudent) ){
+        if( studentServices.addStudentData(addStudent) ){
             map.put("Message" , addStudent.getId()+" Student is Added Successfully !");
             responseEntity = new ResponseEntity(map , HttpStatus.OK);
             return responseEntity;
@@ -187,7 +189,7 @@ public class StudentController {
     public ResponseEntity editStudent(@RequestBody Student editStudent){
         ResponseEntity responseEntity;
         Map<String , String> map = new HashMap<>();
-        boolean isStudentEdited = editStudentData(editStudent);
+        boolean isStudentEdited = studentServices.editStudentData(editStudent);
         if(isStudentEdited){
             map.put("Message" , editStudent.getId()+" Student data is Updated !" );
             responseEntity = new ResponseEntity(map , HttpStatus.OK);
@@ -205,7 +207,7 @@ public class StudentController {
     public ResponseEntity deleteStudent(@RequestBody String id){
         ResponseEntity responseEntity;
         Map<String , String> map = new HashMap<>();
-        boolean isStudentDeleted = deleteStudentData(Integer.valueOf(id));
+        boolean isStudentDeleted = studentServices.deleteStudentData(Integer.valueOf(id));
         if(isStudentDeleted){
             map.put("Message" , id+" Student data is Deleted !");
             responseEntity = new ResponseEntity(map , HttpStatus.OK);
@@ -218,54 +220,5 @@ public class StudentController {
         }
     }
 
-    //Checking before add a student, if that student data is already available or not
-    private boolean addStudentData(Student addStudent){
-        boolean studentAdded = true;
-        for(Student student : studentList)
-            if(student.getId() == addStudent.getId()){
-                studentAdded = false;
-                break;
-            }
-        if(studentAdded)
-            studentList.add(addStudent);
-        return studentAdded;
 
-    }
-
-    //Checking a student data is available or not for update student data
-    private boolean editStudentData(Student editStudent){
-        boolean studentEdited = false;
-        Iterator<Student> iterator = studentList.iterator();
-
-        while(iterator.hasNext()){
-            Student student = iterator.next();
-            if(student.getId() == editStudent.getId()){
-                iterator.remove();
-                studentEdited = true;
-                break;
-            }
-        }
-
-        if(studentEdited)
-            studentList.add(editStudent);
-        return studentEdited;
-    }
-
-    // Checking a student data is available or not for delete student data
-    private boolean deleteStudentData(int deleteStudentId){
-        boolean studentDeleted = false;
-        Iterator<Student> iterator = studentList.iterator();
-
-        while(iterator.hasNext()){
-            Student student = iterator.next();
-            if(student.getId() == deleteStudentId){
-                iterator.remove();
-                studentDeleted = true;
-                break;
-            }
-        }
-
-        return studentDeleted;
-
-    }
 }
