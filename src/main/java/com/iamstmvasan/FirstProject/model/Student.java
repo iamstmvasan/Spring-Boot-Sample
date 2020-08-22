@@ -8,8 +8,8 @@ public class Student {
     private int id;
     private String name;
     private String dept;
-    private List language;
-    private Address address;
+    private Qualification qualification;
+    //private Address address;
 
     public int getId() {
         return id;
@@ -35,19 +35,21 @@ public class Student {
         this.dept = dept;
     }
 
-    public List getLanguage() {
-        return language;
+    public Qualification getQualification() {
+        return qualification;
     }
 
-    public void setLanguage(List language) {
-        this.language = language;
+    public void setQualification(Qualification qualification) {
+        this.qualification = qualification;
     }
 
-    public Address getAddress() {
+    /*public Address getAddress() {
         return address;
     }
 
     public void setAddress(Address address) {
         this.address = address;
-    }
+    }*/
+
+
 }

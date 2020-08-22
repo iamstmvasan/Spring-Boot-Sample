@@ -4,6 +4,7 @@ public class Address {
     private String doorNo;
     private String street;
     private String city;
+    private Integer pin;
 
     public String getDoorNo() {
         return doorNo;
@@ -37,5 +38,5 @@ public class Address {
         this.pin = pin;
     }
 
-    Integer pin;
+
 }
