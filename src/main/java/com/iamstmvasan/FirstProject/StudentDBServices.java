@@ -24,15 +24,47 @@ public class StudentDBServices {
     }
 
     public ResponseEntity addStudentToDB(Student addStudent){
-        studentList = getAllStudents();
-        boolean isIdAvailable = addStudent(addStudent.getId());
+        if(studentList.isEmpty())
+            studentList = getAllStudents();
+        boolean isIdAvailable = isIdAvailable(addStudent.getId());
         if(isIdAvailable){
             return new ResponseEntity("Student Id is already Availbale !" , HttpStatus.NOT_ACCEPTABLE);
         }else{
             return studentDBRepository.addStudentToDB(addStudent);
         }
     }
-    private boolean addStudent(int id){
+
+    public ResponseEntity updateStudentInDB(Student updateStudent){
+        if(studentList.isEmpty())
+            studentList = getAllStudents();
+        if(isIdAvailable(updateStudent.getId())){
+            return studentDBRepository.updateStudentInDB(updateStudent);
+        }else{
+            return new ResponseEntity("Student Id is not Available for update/edit data !" , HttpStatus.NOT_FOUND);
+        }
+    }
+    public ResponseEntity deleteStudentInDB(int id){
+        if(studentList.isEmpty())
+            studentList = getAllStudents();
+        if(isIdAvailable(id)){
+            return studentDBRepository.deleteStudentInDB(id);
+        }else{
+            return new ResponseEntity("Student Id is not Available for delete data/record !" , HttpStatus.NOT_FOUND);
+        }
+    }
+    public ResponseEntity fetchStudentByCgpa(int cgpa){
+        return studentDBRepository.fetchStudentByCgpa(cgpa);
+    }
+    public ResponseEntity fetchNameById(int id){
+        if(studentList.isEmpty())
+            studentList = getAllStudents();
+        if(isIdAvailable(id)){
+            return studentDBRepository.fetchNameById(id);
+        }else{
+            return new ResponseEntity("Student Id is not Available for fetch Name !" , HttpStatus.NOT_FOUND);
+        }
+    }
+    private boolean isIdAvailable(int id){
         boolean isIdAvailable = false;
         for(Student student : studentList)
             if(student.getId() == id){
